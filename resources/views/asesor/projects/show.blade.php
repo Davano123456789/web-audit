@@ -324,7 +324,7 @@
             // Get responses for this specific process
             $processResponses = $project->responses->filter(function($r) use ($processCode) {
                 return $r->question && explode('.', $r->question->practice_code)[0] === $processCode;
-            })->sortBy(fn($r) => $r->question->practice_code . '_' . $r->question->id);
+            })->sortBy(fn($r) => $r->question->level . '_' . $r->question->practice_code . '_' . $r->question->id);
         @endphp
 
         <div id="modal-{{ $processCode }}" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title-{{ $processCode }}" role="dialog" aria-modal="true">

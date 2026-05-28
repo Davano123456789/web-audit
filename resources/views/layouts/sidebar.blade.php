@@ -12,7 +12,6 @@
             </div>
             <div class="flex flex-col">
                 <span class="text-sm font-bold text-white tracking-wide group-hover:text-indigo-400 transition-colors">Web Audit</span>
-                <span class="text-[10px] text-slate-500 font-medium tracking-wider uppercase">Enterprise</span>
             </div>
         </a>
 

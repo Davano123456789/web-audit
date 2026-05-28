@@ -75,10 +75,11 @@
     <div class="px-6 py-4 border-b border-slate-50 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-50/20 select-none">
         <div class="flex items-center space-x-2 text-xs text-slate-500">
             <span>Menampilkan</span>
-            <select class="bg-white border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-sky-500">
+            <select id="entries-limit" class="bg-white border border-slate-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-sky-500">
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
+                <option value="all">Semua</option>
             </select>
             <span>entri</span>
         </div>
@@ -88,7 +89,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
             </span>
-            <input type="text" placeholder="Cari..." class="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-4 py-1.5 text-xs text-slate-650 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 transition-all">
+            <input type="text" id="search-input" placeholder="Cari..." class="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-4 py-1.5 text-xs text-slate-650 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 transition-all">
         </div>
     </div>
 
@@ -130,11 +131,17 @@
                         <td class="py-4 px-6">
                             <div class="flex flex-wrap gap-2.5">
                                 @forelse($project->projectProcesses as $projectProcess)
-                                    <a href="{{ route('asesor.projects.workspace', [$project->id, $projectProcess->process_code]) }}" 
-                                       class="text-sky-500 font-extrabold hover:text-sky-600 hover:underline transition-all text-xs tracking-wide"
-                                       title="Buka Workspace Penilaian {{ $projectProcess->process_code }}">
-                                        {{ $projectProcess->process_code }}
-                                    </a>
+                                    @if(auth()->user()->role === 'admin')
+                                        <span class="text-slate-500 font-semibold text-xs tracking-wide bg-slate-50 px-2 py-0.5 rounded border border-slate-100" title="Proses {{ $projectProcess->process_code }}">
+                                            {{ $projectProcess->process_code }}
+                                        </span>
+                                    @else
+                                        <a href="{{ route('asesor.projects.workspace', [$project->id, $projectProcess->process_code]) }}" 
+                                           class="text-sky-500 font-extrabold hover:text-sky-600 hover:underline transition-all text-xs tracking-wide"
+                                           title="Buka Workspace Penilaian {{ $projectProcess->process_code }}">
+                                            {{ $projectProcess->process_code }}
+                                        </a>
+                                    @endif
                                 @empty
                                     <span class="text-[10px] text-slate-400 italic">Belum ada proses terpilih</span>
                                 @endforelse
@@ -155,6 +162,7 @@
                                 </a>
                                 
                                 <!-- Edit Button -->
+                                @if(auth()->user()->role !== 'admin')
                                 <a href="{{ route('admin.projects.edit', $project->id) }}" 
                                    class="p-1.5 bg-slate-50 text-slate-500 hover:bg-amber-50 hover:text-amber-600 rounded-md border border-slate-100 transition-colors" 
                                    title="Ubah Konfigurasi Proyek">
@@ -162,6 +170,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                     </svg>
                                 </a>
+                                @endif
                                 
                                 <!-- Delete Button -->
                                 <button type="button" onclick="confirmDelete('{{ $project->id }}')" 
@@ -209,5 +218,72 @@
             }
         });
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search-input');
+        const entriesLimit = document.getElementById('entries-limit');
+        const tbody = document.querySelector('tbody');
+
+        if (searchInput && entriesLimit && tbody) {
+            // Create a custom "no results found" row
+            const noResultsRow = document.createElement('tr');
+            noResultsRow.id = 'no-results-row';
+            noResultsRow.className = 'hidden';
+            noResultsRow.innerHTML = `
+                <td colspan="5" class="py-8 px-6 text-center text-slate-400 font-medium select-none">
+                    Tidak ada proyek yang cocok dengan pencarian Anda.
+                </td>
+            `;
+            tbody.appendChild(noResultsRow);
+
+            function updateTable() {
+                const query = searchInput.value.toLowerCase().trim();
+                const limitVal = entriesLimit.value;
+                const limit = limitVal === 'all' ? Infinity : parseInt(limitVal);
+                
+                const rows = tbody.querySelectorAll('tr:not(#no-results-row)');
+                let visibleCount = 0;
+                let matchCount = 0;
+
+                rows.forEach((row) => {
+                    const emptyDbRow = row.querySelector('td[colspan]');
+                    if (emptyDbRow) {
+                        // If DB is empty, show the default empty row only if search is empty
+                        row.style.display = query === '' ? '' : 'none';
+                        return;
+                    }
+
+                    // Extract text for matching
+                    const text = row.textContent.toLowerCase();
+                    const matchesSearch = text.includes(query);
+
+                    if (matchesSearch) {
+                        matchCount++;
+                        if (visibleCount < limit) {
+                            row.style.display = '';
+                            visibleCount++;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                // Display "no results" row if no rows match the query
+                if (query !== '' && matchCount === 0) {
+                    noResultsRow.classList.remove('hidden');
+                } else {
+                    noResultsRow.classList.add('hidden');
+                }
+            }
+
+            searchInput.addEventListener('input', updateTable);
+            entriesLimit.addEventListener('change', updateTable);
+            
+            // Run initially to apply the default limit (e.g. 10 entries)
+            updateTable();
+        }
+    });
 </script>
 @endsection

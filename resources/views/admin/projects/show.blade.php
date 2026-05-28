@@ -27,7 +27,9 @@
                 <span class="text-slate-500">Draft</span>
             @endif
         </span>
+        @if(auth()->user()->role !== 'admin')
         <a href="{{ route('admin.projects.edit', $project->id) }}" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-colors">Ubah Proyek</a>
+        @endif
     </div>
 </div>
 
@@ -150,6 +152,7 @@
                                 </button>
                             @endif
 
+                            @if(auth()->user()->role !== 'admin')
                             <a href="{{ route('asesor.projects.workspace', [$project->id, $projectProcess->process_code]) }}" class="inline-flex items-center justify-center px-4 py-2 text-xs font-bold rounded-xl shadow-2xs hover:scale-[1.01] active:scale-[0.99] transition-all min-w-[120px] {{ $projectProcess->status === 'completed' ? 'bg-slate-150 hover:bg-slate-200 text-slate-700 border border-slate-200' : 'bg-sky-500 hover:bg-sky-600 text-white' }}">
                                 @if($projectProcess->status === 'completed')
                                     Ulangi Penilaian
@@ -159,6 +162,7 @@
                                     Mulai Asesmen
                                 @endif
                             </a>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -334,7 +338,7 @@
             // Get responses for this specific process
             $processResponses = $project->responses->filter(function($r) use ($processCode) {
                 return $r->question && explode('.', $r->question->practice_code)[0] === $processCode;
-            })->sortBy(fn($r) => $r->question->practice_code . '_' . $r->question->id);
+            })->sortBy(fn($r) => $r->question->level . '_' . $r->question->practice_code . '_' . $r->question->id);
         @endphp
 
         <div id="modal-{{ $processCode }}" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title-{{ $processCode }}" role="dialog" aria-modal="true">
