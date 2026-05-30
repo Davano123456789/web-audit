@@ -15,7 +15,7 @@ class AsesorController extends Controller
      */
     public function index()
     {
-        $asesors = User::where('role', 'asesor')->latest()->get();
+        $asesors = User::latest()->get();
         return view('admin.asesors.index', compact('asesors'));
     }
 
@@ -36,22 +36,37 @@ class AsesorController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:6'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'address' => ['nullable', 'string'],
+            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'], // max 2MB
         ], [
-            'name.required' => 'Nama asesor wajib diisi.',
+            'name.required' => 'Nama pengguna wajib diisi.',
             'email.required' => 'Email wajib diisi.',
             'email.unique' => 'Email ini sudah terdaftar di sistem.',
             'password.required' => 'Kata sandi wajib diisi.',
             'password.min' => 'Kata sandi minimal berisi 6 karakter.',
+            'photo.image' => 'Berkas foto profil harus berupa gambar.',
+            'photo.max' => 'Ukuran foto profil maksimal adalah 2MB.',
         ]);
+
+        $photoPath = null;
+        if ($request->hasFile('photo')) {
+            $file = $request->file('photo');
+            $filename = 'profile_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $photoPath = $file->storeAs('profiles', $filename, 'public');
+        }
 
         User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'asesor',
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'photo' => $photoPath,
         ]);
 
-        return redirect()->route('admin.asesors.index')->with('success', 'Akun Asesor berhasil ditambahkan.');
+        return redirect()->route('admin.asesors.index')->with('success', 'Akun pengguna berhasil ditambahkan.');
     }
 
     /**
@@ -59,7 +74,7 @@ class AsesorController extends Controller
      */
     public function edit($id)
     {
-        $asesor = User::where('role', 'asesor')->findOrFail($id);
+        $asesor = User::findOrFail($id);
         return view('admin.asesors.edit', compact('asesor'));
     }
 
@@ -68,22 +83,42 @@ class AsesorController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $asesor = User::where('role', 'asesor')->findOrFail($id);
+        $asesor = User::findOrFail($id);
 
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($asesor->id)],
             'password' => ['nullable', 'string', 'min:6'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'address' => ['nullable', 'string'],
+            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'], // max 2MB
         ], [
-            'name.required' => 'Nama asesor wajib diisi.',
+            'name.required' => 'Nama pengguna wajib diisi.',
             'email.required' => 'Email wajib diisi.',
             'email.unique' => 'Email ini sudah terdaftar di sistem.',
             'password.min' => 'Kata sandi minimal berisi 6 karakter.',
+            'photo.image' => 'Foto profil harus berupa file gambar.',
+            'photo.max' => 'Ukuran foto profil maksimal adalah 2MB.',
         ]);
+
+        $photoPath = $asesor->photo;
+        if ($request->hasFile('photo')) {
+            $file = $request->file('photo');
+            $filename = 'profile_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $photoPath = $file->storeAs('profiles', $filename, 'public');
+
+            // Delete old file if exists
+            if ($asesor->photo) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($asesor->photo);
+            }
+        }
 
         $data = [
             'name' => $request->name,
             'email' => $request->email,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'photo' => $photoPath,
         ];
 
         if ($request->filled('password')) {
@@ -92,7 +127,7 @@ class AsesorController extends Controller
 
         $asesor->update($data);
 
-        return redirect()->route('admin.asesors.index')->with('success', 'Akun Asesor berhasil diperbarui.');
+        return redirect()->route('admin.asesors.index')->with('success', 'Akun pengguna berhasil diperbarui.');
     }
 
     /**
@@ -102,8 +137,12 @@ class AsesorController extends Controller
     {
         $user = User::findOrFail($id);
         
-        if ($user->role !== 'asesor') {
-            return back()->with('error', 'Tindakan tidak sah.');
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+        }
+
+        if ($user->role === 'admin') {
+            return back()->with('error', 'Akun Administrator tidak dapat dihapus melalui menu ini.');
         }
 
         $user->delete();

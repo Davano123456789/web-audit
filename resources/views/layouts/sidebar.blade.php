@@ -73,6 +73,14 @@
                         </a>
                     @endif
 
+                    <!-- Profil Saya -->
+                    <a href="{{ route('profile.edit') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800/60 hover:text-slate-100 transition-all duration-200 group {{ request()->routeIs('profile.*') ? 'bg-slate-800 text-white' : '' }}">
+                        <svg class="w-5 h-5 text-slate-500 group-hover:text-slate-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span>Profil Saya</span>
+                    </a>
+
                 </div>
             </div>
 
@@ -96,15 +104,19 @@
 
     <!-- Active User Sidebar Profile Profile -->
     <div class="p-4 border-t border-slate-800 bg-slate-950/20 flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-            <div class="w-9 h-9 rounded-full bg-indigo-600 border border-indigo-500 flex items-center justify-center font-bold text-white text-xs shadow-sm">
-                {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
-            </div>
+        <a href="{{ route('profile.edit') }}" class="flex items-center space-x-3 group min-w-0 flex-1">
+            @if(auth()->user()->photo)
+                <img src="{{ Storage::url(auth()->user()->photo) }}" alt="Foto Profil" class="w-9 h-9 rounded-full object-cover border border-slate-700 shadow-sm group-hover:border-indigo-500 transition-colors">
+            @else
+                <div class="w-9 h-9 rounded-full bg-indigo-600 border border-indigo-500 flex items-center justify-center font-bold text-white text-xs shadow-sm group-hover:scale-105 transition-transform">
+                    {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+                </div>
+            @endif
             <div class="flex flex-col min-w-0">
-                <span class="text-xs font-semibold text-slate-200 truncate">{{ auth()->user()->name }}</span>
-                <span class="text-[10px] text-slate-500 truncate">{{ auth()->user()->email }}</span>
+                <span class="text-xs font-semibold text-slate-200 truncate group-hover:text-white transition-colors">{{ auth()->user()->name }}</span>
+                <span class="text-[10px] text-slate-500 truncate group-hover:text-slate-400 transition-colors">{{ auth()->user()->email }}</span>
             </div>
-        </div>
+        </a>
         
         <!-- Logout button -->
         <form action="{{ route('logout') }}" method="POST" class="inline">

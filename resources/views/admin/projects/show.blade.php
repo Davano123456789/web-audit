@@ -27,6 +27,12 @@
                 <span class="text-slate-500">Draft</span>
             @endif
         </span>
+        <a href="{{ route('admin.projects.print', $project->id) }}" target="_blank" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs transition-all flex items-center space-x-1.5 shadow-3xs hover:scale-[1.01]">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            <span>Cetak Lembar Kerja</span>
+        </a>
         @if(auth()->user()->role !== 'admin')
         <a href="{{ route('admin.projects.edit', $project->id) }}" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-colors">Ubah Proyek</a>
         @endif
@@ -73,21 +79,44 @@
                 <span class="text-xs text-slate-500 font-semibold">dari skala 5.00</span>
             </div>
             
-            <div class="p-3 bg-slate-800/40 border border-slate-800 rounded-xl">
-                <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Kesimpulan Level:</h4>
-                <p class="text-xs font-medium text-indigo-300 leading-normal">
-                    @if($project->maturity_index)
-                        @if($project->maturity_index >= 4.51) Level 5 (Optimized)
-                        @elseif($project->maturity_index >= 3.51) Level 4 (Managed)
-                        @elseif($project->maturity_index >= 2.51) Level 3 (Defined)
-                        @elseif($project->maturity_index >= 1.51) Level 2 (Repeatable)
-                        @elseif($project->maturity_index >= 0.51) Level 1 (Initial)
-                        @else Level 0 (Non-existent)
+            <div class="p-3 bg-slate-800/40 border border-slate-800 rounded-xl space-y-2.5">
+                <div>
+                    <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kesimpulan Level:</h4>
+                    <p class="text-xs font-medium text-indigo-300 leading-normal">
+                        @if($project->maturity_index)
+                            @if($project->maturity_index >= 4.51) Level 5 (Optimized)
+                            @elseif($project->maturity_index >= 3.51) Level 4 (Managed)
+                            @elseif($project->maturity_index >= 2.51) Level 3 (Defined)
+                            @elseif($project->maturity_index >= 1.51) Level 2 (Repeatable)
+                            @elseif($project->maturity_index >= 0.51) Level 1 (Initial)
+                            @else Level 0 (Non-existent)
+                            @endif
+                        @else
+                            Belum ada perhitungan skor final.
                         @endif
-                    @else
-                        Belum ada perhitungan skor final.
-                    @endif
-                </p>
+                    </p>
+                </div>
+
+                @if($project->maturity_index)
+                    <div class="pt-2 border-t border-slate-800/60">
+                        <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Keterangan:</h4>
+                        <p class="text-[11px] text-slate-350 leading-relaxed font-normal">
+                            @if($project->maturity_index >= 4.51)
+                                Proses sudah berjalan secara optimal serta berfokus pada peningkatan yang berkelanjutan untuk meningkatkan kinerja proses.
+                            @elseif($project->maturity_index >= 3.51)
+                                Proses dikelola berdasarkan data dan pengukuran kinerja secara kuantitatif guna untuk meningkatkan efektifitas proses pada suatu organisasi.
+                            @elseif($project->maturity_index >= 2.51)
+                                Proses sudah memiliki standar dan pedoman yang jelas sehingga dapat diterapkan secara konsisten di seluruh organisasi.
+                            @elseif($project->maturity_index >= 1.51)
+                                Proses sudah direncanakan serta telah dilakukan pengukuran kinerja, namun belum memiliki standar yang baku pada seluruh organisasi.
+                            @elseif($project->maturity_index >= 0.51)
+                                Proses sudah dilakukan namun sebagian masih sederhana belum mampu mencapai tujuan Tata Kelola secara optimal.
+                            @else
+                                Proses belum berjalan dan dilaksanakan sepenuhnya dengan baik, sehingga tujuan Tata Kelola serta manajemen dalam area tersebut belum tercapai.
+                            @endif
+                        </p>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

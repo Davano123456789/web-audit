@@ -309,11 +309,15 @@ class AssessmentController extends Controller
                 'status' => $passed ? 'passed' : 'failed'
             ];
 
-            // If failed, the assessment stops immediately! Capability level is locked at $level - 1.
+            // If failed, the assessment stops immediately!
             if (!$passed) {
+                // If score is Largely Achieved (L) (>= 50%), capability level is locked at the current level
+                // If score is Partially (P) or Not Achieved (N) (< 50%), capability level drops to the previous level (level - 1)
+                $capabilityLevel = ($scorePercent >= 50) ? $level : ($level - 1);
+
                 return [
                     'status' => 'completed',
-                    'capability_level' => $level - 1, // failed this level, so capability is the previous one
+                    'capability_level' => max(0, $capabilityLevel),
                     'history' => $history
                 ];
             }

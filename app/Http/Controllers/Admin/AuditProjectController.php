@@ -96,6 +96,25 @@ class AuditProjectController extends Controller
     }
 
     /**
+     * Print the specified audit project report.
+     */
+    public function printProject($id)
+    {
+        $project = AuditProject::with([
+            'asesor', 
+            'projectProcesses.cobitProcess.domain',
+            'projectProcesses.cobitProcess.practices.questions',
+            'responses.question'
+        ])->findOrFail($id);
+
+        if (auth()->user()->role !== 'admin' && $project->asesor_id !== auth()->id()) {
+            abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk mencetak proyek ini.');
+        }
+
+        return view('admin.projects.print', compact('project'));
+    }
+
+    /**
      * Show the form for editing the specified audit project.
      */
     public function edit($id)

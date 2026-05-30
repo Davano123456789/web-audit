@@ -13,6 +13,10 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     
+    // Profile Routes
+    Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    
     // Main Dashboard
     Route::get('/', function () {
         $user = auth()->user();
@@ -39,6 +43,7 @@ Route::middleware('auth')->group(function () {
 
     // Shared projects routes (both Admin and Asesor can manage)
     Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('projects/{id}/print', [\App\Http\Controllers\Admin\AuditProjectController::class, 'printProject'])->name('projects.print');
         Route::resource('projects', \App\Http\Controllers\Admin\AuditProjectController::class);
     });
 

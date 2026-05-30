@@ -1,13 +1,13 @@
 @extends('layouts.master')
 
-@section('title', 'Web Audit - Manajemen Asesor')
+@section('title', 'Web Audit - Manajemen Pengguna')
 
 @section('content')
 <!-- Header Section -->
 <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0 pb-4 border-b border-slate-100">
     <div>
-        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Manajemen Akun Asesor</h1>
-        <p class="text-xs text-slate-500 mt-1">Daftarkan dan kelola hak akses para auditor/asesor lapangan di sistem.</p>
+        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Manajemen Akun Pengguna</h1>
+        <p class="text-xs text-slate-500 mt-1">Kelola dan daftarkan hak akses para pengguna sistem (Admin & Asesor).</p>
     </div>
     <div>
         <!-- Link to dedicated create page -->
@@ -61,17 +61,17 @@
 <div class="bg-white border border-slate-100 rounded-2xl shadow-2xs overflow-hidden">
     <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
         <div>
-            <h2 class="text-sm font-bold text-slate-800">Daftar Asesor Terdaftar</h2>
-            <p class="text-[10px] text-slate-400 mt-0.5">Daftar pengguna dengan peran asesor yang dapat menjalankan kuesioner.</p>
+            <h2 class="text-sm font-bold text-slate-800">Daftar Pengguna Terdaftar</h2>
+            <p class="text-[10px] text-slate-400 mt-0.5">Daftar seluruh pengguna sistem yang terdaftar di dalam aplikasi.</p>
         </div>
-        <span class="text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-full">Total: {{ $asesors->count() }} Asesor</span>
+        <span class="text-[10px] font-bold text-slate-500 bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-full">Total: {{ $asesors->count() }} Pengguna</span>
     </div>
 
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-slate-50 border-b border-slate-100 text-slate-400 text-[10px] font-bold uppercase tracking-wider select-none">
-                    <th class="py-4 px-6">Nama Asesor</th>
+                    <th class="py-4 px-6">Nama Pengguna</th>
                     <th class="py-4 px-6">Alamat Email</th>
                     <th class="py-4 px-6">Mulai Terdaftar</th>
                     <th class="py-4 px-6 text-right">Tindakan</th>
@@ -82,10 +82,28 @@
                     <tr class="hover:bg-slate-50/50 transition-colors">
                         <td class="py-4 px-6 font-semibold text-slate-800">
                             <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 rounded-full bg-indigo-600/10 text-indigo-600 flex items-center justify-center font-bold text-xs">
-                                    {{ strtoupper(substr($asesor->name, 0, 2)) }}
+                                @if($asesor->photo)
+                                    <img src="{{ Storage::url($asesor->photo) }}" alt="Foto Profil" class="w-8 h-8 rounded-full object-cover border border-slate-200 shadow-3xs">
+                                @else
+                                    <div class="w-8 h-8 rounded-full bg-indigo-600/10 text-indigo-600 flex items-center justify-center font-bold text-xs">
+                                        {{ strtoupper(substr($asesor->name, 0, 2)) }}
+                                    </div>
+                                @endif
+                                <div class="flex flex-col">
+                                    <div class="flex items-center space-x-2">
+                                        <span>{{ $asesor->name }}</span>
+                                        @if($asesor->id === auth()->id())
+                                            <span class="inline-block px-1.5 py-0.2 bg-emerald-50 text-emerald-600 border border-emerald-100/60 rounded text-[9px] font-bold">Saya</span>
+                                        @endif
+                                    </div>
+                                    <div class="flex items-center space-x-1.5 mt-0.5 select-none">
+                                        @if($asesor->role === 'admin')
+                                            <span class="inline-block px-1.5 py-0.2 bg-indigo-55 bg-opacity-10 text-indigo-600 border border-indigo-100 rounded text-[8px] font-black uppercase tracking-wider">Admin</span>
+                                        @else
+                                            <span class="inline-block px-1.5 py-0.2 bg-slate-100 text-slate-600 border border-slate-200 rounded text-[8px] font-black uppercase tracking-wider">Asesor</span>
+                                        @endif
+                                    </div>
                                 </div>
-                                <span>{{ $asesor->name }}</span>
                             </div>
                         </td>
                         <td class="py-4 px-6 font-medium text-slate-500">{{ $asesor->email }}</td>
@@ -94,17 +112,19 @@
                             <!-- Link to edit page -->
                             <a href="{{ route('admin.asesors.edit', $asesor->id) }}" class="inline-block px-2.5 py-1.5 bg-slate-50 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 font-semibold rounded-lg transition-colors text-[10px]" title="Ubah Data">Ubah</a>
                             
-                            <!-- Delete action -->
-                            <button type="button" onclick="confirmDelete('{{ $asesor->id }}')" class="px-2.5 py-1.5 bg-rose-50 text-rose-600 font-semibold rounded-lg hover:bg-rose-100 transition-colors text-[10px]" title="Hapus Akun">Hapus</button>
-                            <form id="delete-form-{{ $asesor->id }}" action="{{ route('admin.asesors.destroy', $asesor->id) }}" method="POST" class="hidden">
-                                @csrf
-                                @method('DELETE')
-                            </form>
+                            <!-- Delete action (admins cannot be deleted from here, and users cannot delete themselves) -->
+                            @if($asesor->role !== 'admin' && $asesor->id !== auth()->id())
+                                <button type="button" onclick="confirmDelete('{{ $asesor->id }}')" class="px-2.5 py-1.5 bg-rose-50 text-rose-600 font-semibold rounded-lg hover:bg-rose-100 transition-colors text-[10px]" title="Hapus Akun">Hapus</button>
+                                <form id="delete-form-{{ $asesor->id }}" action="{{ route('admin.asesors.destroy', $asesor->id) }}" method="POST" class="hidden">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                            @endif
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="py-8 px-6 text-center text-slate-400 font-medium">Belum ada akun Asesor yang didaftarkan.</td>
+                        <td colspan="4" class="py-8 px-6 text-center text-slate-400 font-medium">Belum ada akun pengguna yang didaftarkan.</td>
                     </tr>
                 @endforelse
             </tbody>

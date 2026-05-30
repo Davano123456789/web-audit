@@ -160,6 +160,16 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
                                 </a>
+
+                                <!-- Print Button -->
+                                <a href="{{ route('admin.projects.print', $project->id) }}" 
+                                   target="_blank"
+                                   class="p-1.5 bg-slate-50 text-slate-500 hover:bg-emerald-50 hover:text-emerald-600 rounded-md border border-slate-100 transition-colors" 
+                                   title="Cetak Lembar Kerja / Laporan">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                    </svg>
+                                </a>
                                 
                                 <!-- Edit Button -->
                                 @if(auth()->user()->role !== 'admin')
