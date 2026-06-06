@@ -30,7 +30,20 @@
             <!-- Process Select -->
             <div>
                 <label for="process_code" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wide">Proses COBIT</label>
-                <select id="process_code" name="process_code" required class="mt-1.5 w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all">
+                
+                <!-- Domain Filter Tabs -->
+                <div class="mt-1.5 mb-2">
+                    <div class="flex flex-wrap gap-1.5" id="domain-filters">
+                        <button type="button" data-domain="ALL" class="domain-filter-btn px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all bg-indigo-600 text-white shadow-2xs">Semua</button>
+                        <button type="button" data-domain="EDM" class="domain-filter-btn px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all bg-slate-100 hover:bg-slate-200 text-slate-600">EDM</button>
+                        <button type="button" data-domain="APO" class="domain-filter-btn px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all bg-slate-100 hover:bg-slate-200 text-slate-600">APO</button>
+                        <button type="button" data-domain="BAI" class="domain-filter-btn px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all bg-slate-100 hover:bg-slate-200 text-slate-600">BAI</button>
+                        <button type="button" data-domain="DSS" class="domain-filter-btn px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all bg-slate-100 hover:bg-slate-200 text-slate-600">DSS</button>
+                        <button type="button" data-domain="MEA" class="domain-filter-btn px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all bg-slate-100 hover:bg-slate-200 text-slate-600">MEA</button>
+                    </div>
+                </div>
+
+                <select id="process_code" name="process_code" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all">
                     @foreach($processes as $process)
                         <option value="{{ $process->code }}" {{ old('process_code', $question->practice->process_code ?? '') == $process->code ? 'selected' : '' }}>
                             {{ $process->code }} - {{ $process->name }}
@@ -40,6 +53,73 @@
                 @error('process_code')
                     <p class="text-[10px] text-rose-500 mt-1">{{ $message }}</p>
                 @enderror
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const selectEl = document.getElementById('process_code');
+                        if (!selectEl) return;
+
+                        // Keep a copy of all options (except any blank placeholder one)
+                        const allOptions = Array.from(selectEl.options)
+                            .filter(opt => opt.value !== "")
+                            .map(opt => ({
+                                value: opt.value,
+                                text: opt.textContent.trim(),
+                                selected: opt.selected
+                            }));
+
+                        const filterButtons = document.querySelectorAll('.domain-filter-btn');
+
+                        function filterByDomain(domain, skipSelectReset = false) {
+                            filterButtons.forEach(b => {
+                                if (b.getAttribute('data-domain') === domain) {
+                                    b.classList.remove('bg-slate-100', 'hover:bg-slate-200', 'text-slate-600');
+                                    b.classList.add('bg-indigo-600', 'text-white', 'shadow-2xs');
+                                } else {
+                                    b.classList.remove('bg-indigo-600', 'text-white', 'shadow-2xs');
+                                    b.classList.add('bg-slate-100', 'hover:bg-slate-200', 'text-slate-600');
+                                }
+                            });
+
+                            const currentSelected = selectEl.value;
+                            const hasPlaceholder = selectEl.options.length > 0 && selectEl.options[0].value === "";
+
+                            while (selectEl.options.length > (hasPlaceholder ? 1 : 0)) {
+                                selectEl.remove(hasPlaceholder ? 1 : 0);
+                            }
+
+                            let matchingOptions = allOptions;
+                            if (domain !== 'ALL') {
+                                matchingOptions = allOptions.filter(opt => opt.value.startsWith(domain));
+                            }
+
+                            matchingOptions.forEach(opt => {
+                                const newOpt = document.createElement('option');
+                                newOpt.value = opt.value;
+                                newOpt.textContent = opt.text;
+                                if (opt.value === currentSelected || (skipSelectReset && opt.selected)) {
+                                    newOpt.selected = true;
+                                }
+                                selectEl.appendChild(newOpt);
+                            });
+                        }
+
+                        filterButtons.forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                filterByDomain(this.getAttribute('data-domain'));
+                            });
+                        });
+
+                        // Auto-detect initial domain based on selected process
+                        const initialSelectedValue = selectEl.value;
+                        if (initialSelectedValue) {
+                            const match = initialSelectedValue.match(/^(EDM|APO|BAI|DSS|MEA)/);
+                            if (match) {
+                                filterByDomain(match[0], true);
+                            }
+                        }
+                    });
+                </script>
             </div>
 
             <!-- Sub-Practice Code Input -->
