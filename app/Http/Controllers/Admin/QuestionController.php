@@ -60,8 +60,8 @@ class QuestionController extends Controller
             'question_text.required' => 'Butir pertanyaan wajib diisi.',
         ]);
 
-        // Auto-create practice if it does not exist yet
-        $practice = CobitPractice::firstOrCreate(
+        // Auto-create/update practice if it does not exist yet
+        $practice = CobitPractice::updateOrCreate(
             ['code' => $request->practice_code],
             [
                 'process_code' => $request->process_code,
@@ -121,7 +121,7 @@ class QuestionController extends Controller
         ]);
 
         // Auto-create/update practice if it does not exist yet
-        $practice = CobitPractice::firstOrCreate(
+        $practice = CobitPractice::updateOrCreate(
             ['code' => $request->practice_code],
             [
                 'process_code' => $request->process_code,
