@@ -88,7 +88,7 @@ class AuditProjectController extends Controller
             'responses.question'
         ])->findOrFail($id);
 
-        if (auth()->user()->role !== 'admin' && $project->asesor_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && (int) $project->asesor_id !== (int) auth()->id()) {
             abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk melihat rincian proyek ini.');
         }
 
@@ -107,7 +107,7 @@ class AuditProjectController extends Controller
             'responses.question'
         ])->findOrFail($id);
 
-        if (auth()->user()->role !== 'admin' && $project->asesor_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && (int) $project->asesor_id !== (int) auth()->id()) {
             abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk mencetak proyek ini.');
         }
 
@@ -125,7 +125,7 @@ class AuditProjectController extends Controller
             abort(403, 'Akses ditolak. Administrator tidak diperbolehkan mengubah proyek yang telah didelegasikan.');
         }
 
-        if ($project->asesor_id !== auth()->id()) {
+        if ((int) $project->asesor_id !== (int) auth()->id()) {
             abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk mengubah proyek ini.');
         }
 
@@ -149,7 +149,7 @@ class AuditProjectController extends Controller
             abort(403, 'Akses ditolak. Administrator tidak diperbolehkan mengubah proyek yang telah didelegasikan.');
         }
 
-        if ($project->asesor_id !== auth()->id()) {
+        if ((int) $project->asesor_id !== (int) auth()->id()) {
             abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk memperbarui proyek ini.');
         }
 
@@ -201,7 +201,7 @@ class AuditProjectController extends Controller
     {
         $project = AuditProject::findOrFail($id);
 
-        if (auth()->user()->role !== 'admin' && $project->asesor_id !== auth()->id()) {
+        if (auth()->user()->role !== 'admin' && (int) $project->asesor_id !== (int) auth()->id()) {
             abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk menghapus proyek ini.');
         }
 

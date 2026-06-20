@@ -9,6 +9,11 @@ class AuditProject extends Model
     protected $table = 'audit_projects';
     protected $fillable = ['name', 'description', 'asesor_id', 'status', 'maturity_index'];
 
+    protected $casts = [
+        'asesor_id' => 'integer',
+        'maturity_index' => 'float',
+    ];
+
     public function asesor()
     {
         return $this->belongsTo(User::class, 'asesor_id', 'id');

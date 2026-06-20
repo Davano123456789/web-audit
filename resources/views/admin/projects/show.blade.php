@@ -439,7 +439,7 @@
                                                 </td>
                                                 <td class="py-3 px-4 text-center">
                                                     @if($response->evidence_file)
-                                                        <a href="{{ asset('storage/' . $response->evidence_file) }}" target="_blank" class="inline-flex items-center space-x-1 px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg font-bold transition-all text-[10px] border border-indigo-100">
+                                                        <a href="{{ asset('storage/' . $response->evidence_file) }}" download target="_blank" class="inline-flex items-center space-x-1 px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg font-bold transition-all text-[10px] border border-indigo-100">
                                                             <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                                             </svg>

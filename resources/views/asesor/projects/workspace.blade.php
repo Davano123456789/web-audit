@@ -240,7 +240,7 @@
                                         <input type="file" name="evidence_files[{{ $question->id }}]" class="w-full text-[10px] text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-[9px] file:font-bold file:bg-slate-100 file:text-slate-600 hover:file:bg-slate-200 file:transition-colors bg-slate-50/50 border border-slate-100 rounded-lg p-1">
                                         
                                         @if($response && $response->evidence_file)
-                                            <a href="{{ Storage::url($response->evidence_file) }}" target="_blank" class="text-[9px] text-sky-500 font-extrabold hover:underline shrink-0">Buka Bukti</a>
+                                            <a href="{{ Storage::url($response->evidence_file) }}" download target="_blank" class="text-[9px] text-sky-500 font-extrabold hover:underline shrink-0">Buka Bukti</a>
                                         @endif
                                     </div>
                                 </td>
