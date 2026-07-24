@@ -66,10 +66,10 @@ class AuditProjectController extends Controller
         // Connect the selected COBIT processes to this project
         foreach ($request->processes as $processCode) {
             AuditProjectProcess::create([
-                'project_id' => $project->id,
+                'project_id'   => $project->id,
                 'process_code' => $processCode,
-                'target_level' => 3, // default target is Level 3
-                'status' => 'not_started',
+                'target_level' => $request->input("target_levels.{$processCode}", 3),
+                'status'       => 'not_started',
             ]);
         }
 
@@ -182,12 +182,17 @@ class AuditProjectController extends Controller
 
         // Add newly checked ones
         foreach ($request->processes as $processCode) {
-            AuditProjectProcess::firstOrCreate([
-                'project_id' => $project->id,
+            $existing = AuditProjectProcess::firstOrCreate([
+                'project_id'   => $project->id,
                 'process_code' => $processCode,
             ], [
-                'target_level' => 3,
-                'status' => 'not_started',
+                'target_level' => $request->input("target_levels.{$processCode}", 3),
+                'status'       => 'not_started',
+            ]);
+
+            // Update target_level even if the record already exists
+            $existing->update([
+                'target_level' => $request->input("target_levels.{$processCode}", $existing->target_level),
             ]);
         }
 

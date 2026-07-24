@@ -68,12 +68,15 @@
                                     </th>
                                     <th class="py-2.5 px-4 text-[10px] text-slate-500 uppercase tracking-wider">Nama Proses</th>
                                     <th class="py-2.5 px-4 text-[10px] text-slate-500 uppercase tracking-wider">Deskripsi</th>
+                                    <th class="py-2.5 px-4 text-[10px] text-slate-500 uppercase tracking-wider w-28 text-center">Target Level</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100 text-xs text-slate-600">
                                 @foreach($processes as $process)
                                     @php
                                         $isChecked = in_array($process->code, $activeProcesses);
+                                        $existingProcess = $project->projectProcesses->firstWhere('process_code', $process->code);
+                                        $currentTargetLevel = $existingProcess ? $existingProcess->target_level : 3;
                                     @endphp
                                     <tr class="hover:bg-slate-55/40 transition-colors cursor-pointer" onclick="toggleProcessRow('proc-{{ $process->code }}')">
                                         <td class="py-3 px-4 text-center" onclick="event.stopPropagation()">
@@ -81,6 +84,13 @@
                                         </td>
                                         <td class="py-3 px-4 font-bold text-sky-500">{{ $process->code }}</td>
                                         <td class="py-3 px-4 text-slate-700 font-medium">{{ $process->name }}</td>
+                                        <td class="py-3 px-4 text-center" onclick="event.stopPropagation()">
+                                            <select name="target_levels[{{ $process->code }}]" class="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 transition-all">
+                                                @for($lvl = 1; $lvl <= 5; $lvl++)
+                                                    <option value="{{ $lvl }}" {{ $lvl === $currentTargetLevel ? 'selected' : '' }}>Level {{ $lvl }}</option>
+                                                @endfor
+                                            </select>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
