@@ -181,7 +181,7 @@
                                 </button>
                             @endif
 
-                            @if(auth()->user()->role !== 'admin')
+                            @if(auth()->user()->role !== 'admin' || (int) $project->asesor_id === (int) auth()->id())
                             <a href="{{ route('asesor.projects.workspace', [$project->id, $projectProcess->process_code]) }}" class="inline-flex items-center justify-center px-4 py-2 text-xs font-bold rounded-xl shadow-2xs hover:scale-[1.01] active:scale-[0.99] transition-all min-w-[120px] {{ $projectProcess->status === 'completed' ? 'bg-slate-150 hover:bg-slate-200 text-slate-700 border border-slate-200' : 'bg-sky-500 hover:bg-sky-600 text-white' }}">
                                 @if($projectProcess->status === 'completed')
                                     Ulangi Penilaian

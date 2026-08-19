@@ -99,6 +99,7 @@
                 <tr class="bg-slate-50 border-b border-slate-100 text-slate-400 text-[10px] font-bold uppercase tracking-wider select-none">
                     <th class="py-4 px-6 w-12 text-center">No.</th>
                     <th class="py-4 px-6">Nama Proyek</th>
+                    <th class="py-4 px-6">Tanggal Pembuatan</th>
                     <th class="py-4 px-6">User</th>
                     <th class="py-4 px-6">Proses Assessment</th>
                     <th class="py-4 px-6 text-center w-36">Aksi</th>
@@ -122,6 +123,11 @@
                             </div>
                         </td>
                         
+                        <!-- Tanggal Pembuatan -->
+                        <td class="py-4 px-6 text-slate-600">
+                            {{ $project->created_at->format('d/m/Y') }}
+                        </td>
+                        
                         <!-- User (Asesor Pelaksana) -->
                         <td class="py-4 px-6 font-semibold text-slate-700">
                             {{ $project->asesor->name }}
@@ -131,7 +137,7 @@
                         <td class="py-4 px-6">
                             <div class="flex flex-wrap gap-2.5">
                                 @forelse($project->projectProcesses as $projectProcess)
-                                    @if(auth()->user()->role === 'admin')
+                                    @if(auth()->user()->role === 'admin' && (int) $project->asesor_id !== (int) auth()->id())
                                         <span class="text-slate-500 font-semibold text-xs tracking-wide bg-slate-50 px-2 py-0.5 rounded border border-slate-100" title="Proses {{ $projectProcess->process_code }}">
                                             {{ $projectProcess->process_code }}
                                         </span>
@@ -199,7 +205,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="py-8 px-6 text-center text-slate-400 font-medium select-none">Belum ada proyek audit yang dibuat.</td>
+                        <td colspan="6" class="py-8 px-6 text-center text-slate-400 font-medium select-none">Belum ada proyek audit yang dibuat.</td>
                     </tr>
                 @endforelse
             </tbody>

@@ -18,7 +18,11 @@ class AssessmentController extends Controller
      */
     public function index()
     {
-        $projects = AuditProject::where('asesor_id', auth()->id())
+        $adminIds = \App\Models\User::where('role', 'admin')->pluck('id');
+        $projects = AuditProject::where(function ($q) use ($adminIds) {
+                $q->where('asesor_id', auth()->id())
+                  ->orWhereIn('asesor_id', $adminIds);
+            })
             ->withCount('projectProcesses')
             ->latest()
             ->get();

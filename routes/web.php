@@ -29,9 +29,22 @@ Route::middleware('auth')->group(function () {
 
             return view('index', compact('totalProjects', 'totalAsesors', 'totalQuestions', 'avgMaturity', 'recentProjects'));
         } else {
-            $myProjectsCount = \App\Models\AuditProject::where('asesor_id', $user->id)->count();
-            $myCompletedCount = \App\Models\AuditProject::where('asesor_id', $user->id)->where('status', 'completed')->count();
-            $myActiveProjects = \App\Models\AuditProject::where('asesor_id', $user->id)
+            $adminIds = \App\Models\User::where('role', 'admin')->pluck('id');
+
+            $myProjectsCount = \App\Models\AuditProject::where(function ($q) use ($user, $adminIds) {
+                $q->where('asesor_id', $user->id)
+                  ->orWhereIn('asesor_id', $adminIds);
+            })->count();
+
+            $myCompletedCount = \App\Models\AuditProject::where(function ($q) use ($user, $adminIds) {
+                $q->where('asesor_id', $user->id)
+                  ->orWhereIn('asesor_id', $adminIds);
+            })->where('status', 'completed')->count();
+
+            $myActiveProjects = \App\Models\AuditProject::where(function ($q) use ($user, $adminIds) {
+                $q->where('asesor_id', $user->id)
+                  ->orWhereIn('asesor_id', $adminIds);
+            })
                 ->withCount('projectProcesses')
                 ->latest()
                 ->take(5)

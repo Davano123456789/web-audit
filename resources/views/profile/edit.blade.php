@@ -69,7 +69,7 @@
             <!-- Phone Input -->
             <div>
                 <label for="phone" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wide">Nomor Telepon</label>
-                <input type="text" id="phone" name="phone" value="{{ old('phone', $user->phone) }}" class="mt-1.5 w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all" placeholder="Contoh: 08123456789">
+                <input type="text" id="phone" name="phone" value="{{ old('phone', $user->phone) }}" inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="mt-1.5 w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all" placeholder="Contoh: 08123456789">
                 @error('phone')
                     <span class="text-[10px] text-rose-500 mt-1 block">{{ $message }}</span>
                 @enderror

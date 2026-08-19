@@ -108,6 +108,7 @@
                 <thead>
                     <tr class="bg-slate-50 border-b border-slate-100 text-slate-400 text-[10px] font-bold uppercase tracking-wider select-none">
                         <th class="py-4 px-6">Nama Proyek</th>
+                        <th class="py-4 px-6">Tanggal Pembuatan</th>
                         <th class="py-4 px-6">Asesor Ditugaskan</th>
                         <th class="py-4 px-6 text-center">Status</th>
                         <th class="py-4 px-6 text-center">Indeks Kematangan</th>
@@ -123,6 +124,11 @@
                                     <span class="text-[9px] text-slate-400 mt-0.5">{{ Str::limit($project->description, 50) }}</span>
                                 </div>
                             </td>
+                            <!-- Tanggal Pembuatan -->
+                            <td class="py-4 px-6 text-slate-600">
+                                {{ $project->created_at->format('d/m/Y') }}
+                            </td>
+                            
                             <td class="py-4 px-6 font-semibold text-slate-700">
                                 {{ $project->asesor->name }}
                             </td>
@@ -144,7 +150,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-8 px-6 text-center text-slate-400 font-medium">Belum ada proyek audit yang dibuat.</td>
+                            <td colspan="6" class="py-8 px-6 text-center text-slate-400 font-medium">Belum ada proyek audit yang dibuat.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -227,6 +233,7 @@
                 <thead>
                     <tr class="bg-slate-50 border-b border-slate-100 text-slate-400 text-[10px] font-bold uppercase tracking-wider select-none">
                         <th class="py-4 px-6">Nama Proyek</th>
+                        <th class="py-4 px-6">Tanggal Pembuatan</th>
                         <th class="py-4 px-6 text-center">Jumlah Proses</th>
                         <th class="py-4 px-6 text-center">Status</th>
                         <th class="py-4 px-6 text-center">Maturity Index</th>
@@ -242,6 +249,11 @@
                                     <span class="text-[9px] text-slate-400 font-normal mt-0.5">{{ Str::limit($project->description, 50) }}</span>
                                 </div>
                             </td>
+                            <!-- Tanggal Pembuatan -->
+                            <td class="py-4 px-6 text-slate-600">
+                                {{ $project->created_at->format('d/m/Y') }}
+                            </td>
+                            
                             <td class="py-4 px-6 text-center font-bold text-slate-700">
                                 {{ $project->project_processes_count }} proses
                             </td>
@@ -263,7 +275,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-8 px-6 text-center text-slate-400 font-medium">Belum ada tugas proyek audit yang ditugaskan kepada Anda.</td>
+                            <td colspan="6" class="py-8 px-6 text-center text-slate-400 font-medium">Belum ada tugas proyek audit yang ditugaskan kepada Anda.</td>
                         </tr>
                     @endforelse
                 </tbody>
